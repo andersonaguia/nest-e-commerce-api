@@ -22,6 +22,17 @@ export class ProductsService {
     })
   }
 
+  async findOne(id: number): Promise<ProductEntity> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const product = await this.productRepository.findOne({ where: { id: id } });
+        resolve(product);
+      } catch (error) {
+        reject(error);
+      }
+    })
+  }
+
   async create(product: CreateProductDto) {
     return new Promise(async (resolve, reject) => {
       try {
