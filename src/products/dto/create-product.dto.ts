@@ -14,6 +14,9 @@ export class CreateProductDto {
     @IsNotEmpty()
     readonly description: string;
 
+    @IsBoolean()
+    readonly isAvailable: boolean;
+
     @IsEnum(ProductCategory)
     readonly category: ProductCategory;
 }

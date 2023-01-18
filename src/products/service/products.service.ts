@@ -1,23 +1,40 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { ProductEntity } from '../entities/product.entity';
 
 @Injectable()
 export class ProductsService {
-  create(product: CreateProductDto): Promise <ProductEntity> {    
+
+  constructor(
+    @Inject('PRODUCT_REPOSITORY')
+    private readonly productRepository: Repository<ProductEntity>
+  ) { }
+
+  async findAll(): Promise<ProductEntity[]> {
     return new Promise(async (resolve, reject) => {
-      try{   
-        const id = '123456';  
-        const isAvailable = true;   
-        let created = new ProductEntity();
-        created = { ...product, id: id, isAvailable: isAvailable};
-        resolve(created);
-      }catch (error){
-        console.log(error);
-        reject({
-          code: error.code,
-          detail: error.detail
-        })        
+      try {
+        const allProducts = this.productRepository.find();
+        resolve(allProducts);
+      } catch (error) {
+        reject(error);
+      }
+    })
+  }
+
+  async create(product: CreateProductDto) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const productToCreate = new ProductEntity();
+        productToCreate.name = product.name;
+        productToCreate.price = product.price;
+        productToCreate.description = product.description;
+        productToCreate.isAvailable = product.isAvailable;
+        productToCreate.category = product.category;
+        const productCreated = await this.productRepository.insert(productToCreate);
+        resolve(productCreated);
+      } catch (error) {
+        reject(error);
       }
     });
   }

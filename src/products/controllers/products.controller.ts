@@ -1,8 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import { ProductsService } from '../service/products.service';
 import { CreateProductDto } from '../dto/create-product.dto';
-import { ProductEntity } from '../entities/product.entity';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('products')
 @Controller('products')
@@ -15,14 +14,23 @@ export class ProductsController {
     status: 201,
     description: 'Produto cadastrado com sucesso.'
   }) 
-  async create(@Body() createProductDto: CreateProductDto): Promise<ProductEntity> {
+  async create(@Body() createProductDto: CreateProductDto) {
     try{
-      return await this.productsService.create(createProductDto);
+      const result = await this.productsService.create(createProductDto);
+      return "Produto inserido com sucesso!"
     }catch(error){
       if(error){
         throw new HttpException({error: error}, HttpStatus.CONFLICT)
       }      
+    }   
+  }
+
+  @Get()
+  async findAll(){
+    try{
+      return await this.productsService.findAll();
+    }catch(error){
+      throw new BadRequestException(error)
     }
-   
   }
 }
