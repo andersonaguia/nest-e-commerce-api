@@ -1,19 +1,14 @@
-import { Controller, Get, Post, Body, HttpException, HttpStatus, BadRequestException, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException, HttpStatus, BadRequestException, Param, Query } from '@nestjs/common';
 import { ProductsService } from '../service/products.service';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ProductCategory } from '../utils/product-category.enum';
 
-@ApiTags('products')
-@Controller('products')
+@Controller()
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
 
-  @Post()
-  @ApiOperation({ summary: "Create Product" })
-  @ApiResponse({
-    status: 201,
-    description: 'Produto cadastrado com sucesso.'
-  })
+  @Post('/products')
   async create(@Body() createProductDto: CreateProductDto) {
     try {
       const result = await this.productsService.create(createProductDto);
@@ -25,7 +20,7 @@ export class ProductsController {
     }
   }
 
-  @Get()
+  @Get('/products')
   async findAll() {
     try {
       return await this.productsService.findAll();
@@ -34,12 +29,20 @@ export class ProductsController {
     }
   }
 
-  @Get("/:id")
+  @Get("/products/byid/:id")
   async findOne(@Param("id") id: number) {
-    try{
+    try {
       return await this.productsService.findOne(id);
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
+  }
 
-    }catch(error){
+  @Get("/products/searchby")
+  async findByCategory(@Query('category') category: ProductCategory) {
+    try {
+      return await this.productsService.findByCategory(category);
+    } catch (error) {
       throw new BadRequestException(error)
     }
   }

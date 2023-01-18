@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { ProductEntity } from '../entities/product.entity';
+import { ProductCategory } from '../utils/product-category.enum';
 
 @Injectable()
 export class ProductsService {
@@ -27,6 +28,22 @@ export class ProductsService {
       try {
         const product = await this.productRepository.findOne({ where: { id: id } });
         resolve(product);
+      } catch (error) {
+        reject(error);
+      }
+    })
+  }
+
+  async findByCategory(category: ProductCategory): Promise<ProductEntity[]> {
+    console.log(category)
+    return new Promise(async (resolve, reject) => {
+      try {
+        const products = await this.productRepository.find({
+          where: {
+            category: category
+          }
+        })
+        resolve(products);
       } catch (error) {
         reject(error);
       }
