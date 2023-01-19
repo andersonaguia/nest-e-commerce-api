@@ -98,7 +98,36 @@ export class CartsService {
     return `This action updates a #${id} cart`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
+  remove(id: number, cartId: number) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const removed = await this.cartProductRepository.delete({
+          productId: Equal(id),
+          cartId: Equal(cartId)
+        })
+
+        if(removed.affected === 0){
+          resolve("Erro ao remover ou item não presente no carrinho")
+        }
+        const atualCart = await this.cartProductRepository.find({
+          where:{
+            cartId: Equal(cartId),
+          }
+        })
+        if (atualCart.length > 0) {
+          const cartData = new TotalCartDTO();
+          cartData.items = atualCart;
+          const initialValue = 0;
+          cartData.total = atualCart.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.productId.price,
+            initialValue
+          );
+          resolve(cartData);
+        }
+        resolve("O carrinho está vazio");
+      } catch (error) {
+        reject(error);
+      }
+    })
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, NotFoundException, Query } from '@nestjs/common';
 import { CreateCartDto } from '../dto/create-cart.dto';
 import { UpdateCartDto } from '../dto/update-cart.dto';
 import { CartsService } from '../service/carts.service';
@@ -43,8 +43,16 @@ export class CartsController {
     return this.cartsService.update(+id, updateCartDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartsService.remove(+id);
+  @Delete('/carts')
+  async remove(
+    @Query('productId') productId: number,
+    @Query('cartId') cartId: number
+  ) {
+    try {
+      const result = await this.cartsService.remove(+productId, +cartId);
+      return result;
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
   }
 }
