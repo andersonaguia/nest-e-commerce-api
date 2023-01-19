@@ -1,15 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException } from '@nestjs/common';
 import { CreateCartDto } from '../dto/create-cart.dto';
 import { UpdateCartDto } from '../dto/update-cart.dto';
 import { CartsService } from '../service/carts.service';
 
-@Controller('carts')
+@Controller()
 export class CartsController {
-  constructor(private readonly cartsService: CartsService) {}
+  constructor(private readonly cartsService: CartsService) { }
 
-  @Post()
+  @Post('/carts')
   create(@Body() createCartDto: CreateCartDto) {
-    return this.cartsService.create(createCartDto);
+    try {
+      return this.cartsService.createCart(createCartDto);
+    } catch (error) {
+      throw new BadRequestException(error)
+    }    
   }
 
   @Get()

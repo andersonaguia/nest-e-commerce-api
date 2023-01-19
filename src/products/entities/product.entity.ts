@@ -12,7 +12,7 @@ export class ProductEntity {
     @Column({ type: "float" })
     price: number;
 
-    @Column({ length: 255})
+    @Column({ length: 255 })
     description: string;
 
     @Column({ default: true })
