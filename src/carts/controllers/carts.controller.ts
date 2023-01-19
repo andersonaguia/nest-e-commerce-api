@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, NotFoundException, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, BadRequestException, NotFoundException, Query } from '@nestjs/common';
+import { BuyProductsDto } from '../dto/buy-products.dto';
 import { CreateCartDto } from '../dto/create-cart.dto';
-import { UpdateCartDto } from '../dto/update-cart.dto';
 import { CartsService } from '../service/carts.service';
 
 @Controller()
@@ -20,9 +20,17 @@ export class CartsController {
     }
   }
 
-  @Get()
-  findAll() {
-    return this.cartsService.findAll();
+  @Post('/carts/buy')
+  async buyCart(@Body() buyCart: BuyProductsDto) {
+    try {
+      const result = await this.cartsService.buyCart(buyCart);
+      if (result == null) {
+        throw new NotFoundException("Cart is not found");
+      }
+      return result;
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
   }
 
   @Get('/carts/:id')
@@ -36,11 +44,6 @@ export class CartsController {
     } catch (error) {
       throw new BadRequestException(error)
     }
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return this.cartsService.update(+id, updateCartDto);
   }
 
   @Delete('/carts')

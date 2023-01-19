@@ -7,4 +7,7 @@ export class CartEntity {
 
     @Column()
     userId: string;
+
+    @Column({ default: true })
+    active: boolean;
 }
